@@ -21,7 +21,8 @@ if 'user_role' not in st.session_state: st.session_state.user_role = None
 
 # --- MAN HINH DANG NHAP ---
 if not st.session_state.logged_in:
-    st.markdown("<h2 style='text-align: center; color: #0052CC;'>MISA SME TIEN MINH</h2>", unsafe-allow_html=True)
+    st.title("MISA SME TIEN MINH")
+    st.subheader("HE THONG QUAN LY LIEN CO SO CO BAO MAT")
     with st.form("login_form"):
         u_input = st.text_input("Ten tai khoan (Username)")
         p_input = st.text_input("Mat khau (Password)", type="password")
@@ -136,7 +137,7 @@ else:
 
     # --- PHAN HE 2: IN MAU DON DAT HANG ---
     elif menu == "🖨️ In Don dat hang":
-        st.title("🖨️ Mau In Don Dat Hang")
+        st.title("Mau In Don Dat Hang")
         if os.path.exists(HISTORY_FILE):
             df_hist = pd.read_excel(HISTORY_FILE)
             if co_so_user != "Phong Ke Toan":
@@ -154,29 +155,29 @@ else:
                     tong_cong = int(df_select["Thanh_tien"].sum())
                     
                     st.write("---")
-                    st.write(f"**CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH - {m_info['Co_so'].upper()}**")
+                    st.write("CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH")
                     st.write("Lo 04 Khu cong nghiep phu tro, Tinh Ha Tinh, Viet Nam.")
-                    st.markdown("<h2 style='text-align: center;'>DON DAT HANG</h2>", unsafe-allow_html=True)
+                    st.write("DON DAT HANG")
                     
                     col_m1, col_m2 = st.columns(2)
                     with col_m1:
-                        st.write(f"**Ten khach hang:** {m_info['Khach_hang']}")
-                        st.write(f"**Ma khach hang:** {m_info['Ma_khach_hang']}")
-                        st.write("**Dia chi:** Ky Anh - Ha Tinh")
+                        st.write(f"Ten khach hang: {m_info['Khach_hang']}")
+                        st.write(f"Ma khach hang: {m_info['Ma_khach_hang']}")
+                        st.write("Dia chi: Ky Anh - Ha Tinh")
                     with col_m2:
-                        st.write(f"**So chung tu:** {m_info['So_chung_tu']}")
-                        st.write(f"**Ngay hach toan:** {m_info['Ngay_hach_toan']}")
-                        st.write("**Loai tien:** VND")
+                        st.write(f"So chung tu: {m_info['So_chung_tu']}")
+                        st.write(f"Ngay hach toan: {m_info['Ngay_hach_toan']}")
+                        st.write("Loai tien: VND")
                         
                     st.write("")
                     df_print = df_select[["Ma_hang", "Ten_hang", "So_luong", "Don_gia", "Thanh_tien"]].copy()
                     df_print.columns = ["Ma hang", "Ten hang", "So luong", "Don gia", "Thanh tien"]
                     st.dataframe(df_print, use_container_width=True)
                     
-                    st.write(f"**Tong tien thanh toan:** {tong_cong:,} VND")
-                    st.write("**So tien bang chu:** Bay trieu bon tram muoi ba nghin dong chan./.")
+                    st.write(f"Tong tien thanh toan: {tong_cong:,} VND")
+                    st.write("So tien bang chu: Bay trieu bon tram muoi ba nghin dong chan./.")
                     st.write("---")
-                    st.write("**Nguoi mua hang** | **Ke toan truong** | **Nguoi lap phieu**")
-                    st.write("*(Ky, ho ten)* | *(Ky, ho ten)* | *(Ky, ho ten)*")
+                    st.write("Nguoi mua hang | Ke toan truong | Nguoi lap phieu")
+                    st.write("(Ky, ho ten) | (Ky, ho ten) | (Ky, ho ten)")
                     st.write("")
-                    st.write("💡 *Nhan to hop phim **Ctrl + P** tren ban phim de tien hanh in phieu nay ra giay hoac luu file PDF.*")
+                    st.write("💡 Nhan to hop phim Ctrl + P tren ban phim de tien hanh in phieu nay ra giay hoac luu file PDF.")
