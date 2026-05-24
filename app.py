@@ -191,5 +191,3 @@ else:
                     st.write("Nguoi mua hang | Ke toan truong | Nguoi lap phieu")
                     st.write("(Ky, ho ten) | (Ky, ho ten) | (Ky, ho ten)")
                     st.write("")
-                    
-                    if st.button("🖨️ Mo cua so huong dan IN"):
