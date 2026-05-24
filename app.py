@@ -19,6 +19,49 @@ USER_CREDENTIALS = {
 if 'logged_in' not in st.session_state: st.session_state.logged_in = False
 if 'user_role' not in st.session_state: st.session_state.user_role = None
 
+# --- HAM TU DONG CHUYEN SO TIEN THANH CHU TIENG VIET CHUAN CHINH ---
+def doc_so_tien_thanh_chu(so_tien):
+    if so_tien == 0: return "Khong dong"
+    
+    chu_so = ["khong", "mot", "hai", "ba", "bon", "nam", "sau", "bay", "tam", "chin"]
+    
+    def doc_block_3_so(n, m):
+        if n == 0: return ""
+        tram = n // 100
+        chuc = (n % 100) // 10
+        don_vi = n % 10
+        kq = ""
+        if m or tram > 0:
+            kq += chu_so[tram] + " tram "
+        if chuc == 0:
+            if m and don_vi > 0: kq += "le "
+        elif chuc == 1:
+            kq += "muoi "
+        else:
+            kq += chu_so[chuc] + " muoi "
+        if don_vi > 0:
+            if don_vi == 1 and chuc > 1: kq += "mot "
+            elif don_vi == 5 and chuc > 0: kq += "lam "
+            else: kq += chu_so[don_vi] + " "
+        return kq
+
+    tram_trieu = (so_tien // 1000000) % 1000
+    tram_nghin = (so_tien // 1000) % 1000
+    dong = so_tien % 1000
+    
+    chuoi_chu = ""
+    if tram_trieu > 0:
+        chuoi_chu += doc_block_3_so(tram_trieu, False) + "trieu "
+    if tram_nghin > 0:
+        chuoi_chu += doc_block_3_so(tram_nghin, tram_trieu > 0) + "nghin "
+    if dong > 0:
+        chuoi_chu += doc_block_3_so(dong, tram_nghin > 0 or tram_trieu > 0)
+        
+    chuoi_chu = chuoi_chu.strip()
+    if chuoi_chu:
+        chuoi_chu = chuoi_chu[0].upper() + chuoi_chu[1:]
+    return chuoi_chu + " dong chan./."
+
 # --- MAN HINH DANG NHAP ---
 if not st.session_state.logged_in:
     st.title("MISA SME TIEN MINH")
@@ -44,7 +87,6 @@ else:
         
     menu = st.sidebar.radio("PHAN HE CHUC NANG", ["💼 Ban hang (Chung tu)", "🖨️ In Don dat hang"])
 
-    # --- HAM LAY SO CHUNG TU TANG DAN TU DONG CHONG TRUNG LAP ---
     def get_next_so_ct():
         for _ in range(20):
             try:
@@ -110,7 +152,6 @@ else:
                         st.success(f"Da Ghi so thanh cong voi Ma chung tu: {so_ct_final}")
                         st.rerun()
 
-        # Doc va hien thi danh sach bang bieu hach toan
         if os.path.exists(HISTORY_FILE):
             df_hist = pd.read_excel(HISTORY_FILE)
             if co_so_user != "Phong Ke Toan":
@@ -135,7 +176,7 @@ else:
         else:
             st.info("He thong chua co du lieu phat sinh.")
 
-    # --- PHAN HE 2: IN MAU DON DAT HANG ---
+    # --- PHAN HE 2: IN MAU DON DAT HANG PHIÊN BẢN TỰ ĐỘNG CHUYỂN CHỮ ĐẸP ---
     elif menu == "🖨️ In Don dat hang":
         st.title("Mau In Don Dat Hang")
         if os.path.exists(HISTORY_FILE):
@@ -154,6 +195,9 @@ else:
                     m_info = df_select.iloc[0]
                     tong_cong = int(df_select["Thanh_tien"].sum())
                     
+                    # Tu dong dich tong tien hien tai cua hoa don thanh chu tieng Viet
+                    chu_so_tien = doc_so_tien_thanh_chu(tong_cong)
+                    
                     st.write("---")
                     st.write("CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH")
                     st.write("Lo 04 Khu cong nghiep phu tro, Tinh Ha Tinh, Viet Nam.")
@@ -169,15 +213,3 @@ else:
                         st.write(f"Ngay hach toan: {m_info['Ngay_hach_toan']}")
                         st.write("Loai tien: VND")
                         
-                    st.write("")
-                    df_print = df_select[["Ma_hang", "Ten_hang", "So_luong", "Don_gia", "Thanh_tien"]].copy()
-                    df_print.columns = ["Ma hang", "Ten hang", "So luong", "Don gia", "Thanh tien"]
-                    st.dataframe(df_print, use_container_width=True)
-                    
-                    st.write(f"Tong tien thanh toan: {tong_cong:,} VND")
-                    st.write("So tien bang chu: Bay trieu bon tram muoi ba nghin dong chan./.")
-                    st.write("---")
-                    st.write("Nguoi mua hang | Ke toan truong | Nguoi lap phieu")
-                    st.write("(Ky, ho ten) | (Ky, ho ten) | (Ky, ho ten)")
-                    st.write("")
-                    st.write("💡 Nhan to hop phim Ctrl + P tren ban phim de tien hanh in phieu nay ra giay hoac luu file PDF.")
