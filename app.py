@@ -6,10 +6,23 @@ import time
 
 st.set_page_config(page_title="MISA SME - TOI UU SO CHUNG TU", layout="wide")
 
+# --- ĐOẠN CODE PHONG TOẢ: TỰ ĐỘNG ẨN MENU VÀ NÚT BẤM KHI IN RẤT THÔNG MINH ---
+st.markdown("""
+    <style>
+    @media print {
+        [data-testid="stSidebar"], header, .stButton, [data-testid="stExpander"], div.stSelectbox {
+            display: none !important;
+        }
+        .main .block-container {
+            padding: 0 !important;
+        }
+    }
+    </style>
+""", unsafe-allow_html=True)
+
 PRODUCT_FILE = "kho_hang_lien_co_so.xlsx"
 HISTORY_FILE = "lich_su_lien_co_so.xlsx"
 
-# Tai khoan va phan quyen bao mat cho cac co so
 USER_CREDENTIALS = {
     "ketoan_tienminh": {"password": "tienminh2026", "role": "Phong Ke Toan"},
     "coso_1a": {"password": "1a@tienminh", "role": "Co so 1A"},
@@ -19,10 +32,8 @@ USER_CREDENTIALS = {
 if 'logged_in' not in st.session_state: st.session_state.logged_in = False
 if 'user_role' not in st.session_state: st.session_state.user_role = None
 
-# --- HAM TU DONG CHUYEN SO TIEN THANH CHU TIENG VIET KHONG DAU CHONG LOI DICH ---
 def doc_so_tien_thanh_chu(so_tien):
     if so_tien == 0: return "Khong dong"
-    
     chu_so = ["khong", "mot", "hai", "ba", "bon", "nam", "sau", "bay", "tam", "chin"]
     
     def doc_block_3_so(n, m):
@@ -31,14 +42,11 @@ def doc_so_tien_thanh_chu(so_tien):
         chuc = (n % 100) // 10
         don_vi = n % 10
         kq = ""
-        if m or tram > 0:
-            kq += chu_so[tram] + " tram "
+        if m or tram > 0: kq += chu_so[tram] + " tram "
         if chuc == 0:
             if m and don_vi > 0: kq += "le "
-        elif chuc == 1:
-            kq += "muoi "
-        else:
-            kq += chu_so[chuc] + " muoi "
+        elif chuc == 1: kq += "muoi "
+        else: kq += chu_so[chuc] + " muoi "
         if don_vi > 0:
             if don_vi == 1 and chuc > 1: kq += "mot "
             elif don_vi == 5 and chuc > 0: kq += "lam "
@@ -50,19 +58,14 @@ def doc_so_tien_thanh_chu(so_tien):
     dong = so_tien % 1000
     
     chuoi_chu = ""
-    if tram_trieu > 0:
-        chuoi_chu += doc_block_3_so(tram_trieu, False) + "trieu "
-    if tram_nghin > 0:
-        chuoi_chu += doc_block_3_so(tram_nghin, tram_trieu > 0) + "nghin "
-    if dong > 0:
-        chuoi_chu += doc_block_3_so(dong, tram_nghin > 0 or tram_trieu > 0)
+    if tram_trieu > 0: chuoi_chu += doc_block_3_so(tram_trieu, False) + "trieu "
+    if tram_nghin > 0: chuoi_chu += doc_block_3_so(tram_nghin, tram_trieu > 0) + "nghin "
+    if dong > 0: chuoi_chu += doc_block_3_so(dong, tram_nghin > 0 or tram_trieu > 0)
         
     chuoi_chu = chuoi_chu.strip()
-    if chuoi_chu:
-        chuoi_chu = chuoi_chu[0].upper() + chuoi_chu[1:]
+    if chuoi_chu: chuoi_chu = chuoi_chu.upper() + chuoi_chu[1:]
     return chuoi_chu + " dong chan./."
 
-# --- MAN HINH DANG NHAP ---
 if not st.session_state.logged_in:
     st.title("MISA SME TIEN MINH")
     st.subheader("HE THONG QUAN LY LIEN CO SO CO BAO MAT")
@@ -74,8 +77,7 @@ if not st.session_state.logged_in:
                 st.session_state.logged_in = True
                 st.session_state.user_role = USER_CREDENTIALS[u_input]["role"]
                 st.rerun()
-            else:
-                st.error("Sai tai khoan hoac mat khau!")
+            else: st.error("Sai tai khoan hoac mat khau!")
 else:
     co_so_user = st.session_state.user_role
     st.sidebar.title("MISA SME LIEN CO SO")
@@ -97,21 +99,15 @@ else:
                         if not df_bh.empty:
                             last_so_ct = df_bh.iloc[-1]["So_chung_tu"]
                             last_num = int(last_so_ct.replace("BH", ""))
-                            next_num = last_num + 1
-                            return f"BH{next_num:03d}"
+                            return f"BH{(last_num + 1):03d}"
                 return "BH001"
-            except:
-                time.sleep(0.05)
+            except: time.sleep(0.05)
         return f"BH{int(time.time())}"
 
-    # --- PHAN HE 1: BAN HANG ---
     if menu == "💼 Ban hang (Chung tu)":
         st.title(f"Ban hang - Danh sach chung tu ({co_so_user})")
-        
-        if os.path.exists(HISTORY_FILE):
-            df_hist = pd.read_excel(HISTORY_FILE)
-        else:
-            df_hist = pd.DataFrame()
+        if os.path.exists(HISTORY_FILE): df_hist = pd.read_excel(HISTORY_FILE)
+        else: df_hist = pd.DataFrame()
 
         if co_so_user != "Phong Ke Toan":
             df_filtered = df_hist[df_hist["Co_so"] == co_so_user] if not df_hist.empty else pd.DataFrame()
@@ -135,29 +131,22 @@ else:
                     if st.form_submit_button("💾 Cat va Ghi so (Luu hoa don)"):
                         thanh_tien = int(gia * sl)
                         so_ct_final = get_next_so_ct()
-                        
                         new_row = {
                             "Co_so": co_so_user, "Ngay_hach_toan": datetime.now().strftime("%d/%m/%Y"),
                             "So_chung_tu": so_ct_final, "So_hoa_don": so_hd, "Ma_khach_hang": ma_kh, "Khach_hang": ten_kh,
                             "Ma_hang": ma_h, "Ten_hang": ten_h, "So_luong": sl, "Don_gia": gia, "Thanh_tien": thanh_tien
                         }
-                        
                         if os.path.exists(HISTORY_FILE):
                             df_current = pd.read_excel(HISTORY_FILE)
                             df_current = pd.concat([df_current, pd.DataFrame([new_row])], ignore_index=True)
-                        else:
-                            df_current = pd.DataFrame([new_row])
-                            
+                        else: df_current = pd.DataFrame([new_row])
                         df_current.to_excel(HISTORY_FILE, index=False)
                         st.success(f"Da Ghi so thanh cong voi Ma chung tu: {so_ct_final}")
                         st.rerun()
 
         if os.path.exists(HISTORY_FILE):
             df_hist = pd.read_excel(HISTORY_FILE)
-            if co_so_user != "Phong Ke Toan":
-                df_filtered = df_hist[df_hist["Co_so"] == co_so_user]
-            else:
-                df_filtered = df_hist
+            df_filtered = df_hist[df_hist["Co_so"] == co_so_user] if co_so_user != "Phong Ke Toan" else df_hist
                 
             if not df_filtered.empty:
                 st.subheader("Danh sach hoa don phia tren (Master)")
@@ -171,20 +160,14 @@ else:
                 selected_ct = st.selectbox("Chon So chung tu de xem chi tiet", list_ct)
                 df_detail = df_filtered[df_filtered["So_chung_tu"] == selected_ct][["Ma_hang", "Ten_hang", "So_luong", "Don_gia", "Thanh_tien"]]
                 st.dataframe(df_detail, use_container_width=True)
-            else:
-                st.info("Chua co hoa don nao phat sinh.")
-        else:
-            st.info("He thong chua co du lieu phat sinh.")
+            else: st.info("Chua co hoa don nao phat sinh.")
+        else: st.info("He thong chua co du lieu phat sinh.")
 
-    # --- PHAN HE 2: IN MAU DON DAT HANG ---
     elif menu == "🖨️ In Don dat hang":
-        st.title("Mau In Don Dat Hang")
+        st.markdown("<div class='print-hide'><h3>Mau In Don Dat Hang</h3></div>", unsafe-allow_html=True)
         if os.path.exists(HISTORY_FILE):
             df_hist = pd.read_excel(HISTORY_FILE)
-            if co_so_user != "Phong Ke Toan":
-                df_filtered = df_hist[df_hist["Co_so"] == co_so_user]
-            else:
-                df_filtered = df_hist
+            df_filtered = df_hist[df_hist["Co_so"] == co_so_user] if co_so_user != "Phong Ke Toan" else df_hist
                 
             if not df_filtered.empty:
                 list_ct = df_filtered["So_chung_tu"].drop_duplicates().tolist()
@@ -192,25 +175,27 @@ else:
                 df_select = df_filtered[df_filtered["So_chung_tu"] == selected_ct]
                 
                 if not df_select.empty:
-                    # --- ĐÃ VÁ LỖI ILOC[0] TẠI ĐÂY ---
                     m_info = df_select.iloc[0]
                     tong_cong = int(df_select["Thanh_tien"].sum())
-                    
                     chu_so_tien = doc_so_tien_thanh_chu(tong_cong)
                     
                     st.write("---")
-                    st.write("CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH")
+                    st.write("**CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH**")
                     st.write("Lo 04 Khu cong nghiep phu tro, Tinh Ha Tinh, Viet Nam.")
-                    st.subheader("DON DAT HANG")
+                    st.write("### DON DAT HANG")
                     
                     col_m1, col_m2 = st.columns(2)
                     with col_m1:
-                        st.write(f"**Ten khach hang:** {m_info['Khach_hang']}")
-                        st.write(f"**Ma khach hang:** {m_info['Ma_khach_hang']}")
-                        st.write("**Dia chi:** Ky Anh - Ha Tinh")
+                        st.write(f"Ten khach hang: {m_info['Khach_hang']}")
+                        st.write(f"Ma khach hang: {m_info['Ma_khach_hang']}")
+                        st.write("Dia chi: Ky Anh - Ha Tinh")
                     with col_m2:
-                        st.write(f"**So chung tu:** {m_info['So_chung_tu']}")
-                        st.write(f"**Ngay hach toan:** {m_info['Ngay_hach_toan']}")
-                        st.write("**Loai tien:** VND")
+                        st.write(f"So chung tu: {m_info['So_chung_tu']}")
+                        st.write(f"Ngay hach toan: {m_info['Ngay_hach_toan']}")
+                        st.write("Loai tien: VND")
                         
                     st.write("")
+                    df_print = df_select[["Ma_hang", "Ten_hang", "So_luong", "Don_gia", "Thanh_tien"]].copy()
+                    df_print.columns = ["Ma hang", "Ten hang", "So luong", "Don gia", "Thanh tien"]
+                    st.dataframe(df_print, use_container_width=True)
+                    
