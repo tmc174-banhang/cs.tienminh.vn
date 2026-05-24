@@ -19,7 +19,7 @@ USER_CREDENTIALS = {
 if 'logged_in' not in st.session_state: st.session_state.logged_in = False
 if 'user_role' not in st.session_state: st.session_state.user_role = None
 
-# --- HAM TU DONG CHUYEN SO TIEN THANH CHU TIENG VIET CHUAN CHINH ---
+# --- HAM TU DONG CHUYEN SO TIEN THANH CHU TIENG VIET KHONG DAU CHONG LOI DICH ---
 def doc_so_tien_thanh_chu(so_tien):
     if so_tien == 0: return "Khong dong"
     
@@ -176,7 +176,7 @@ else:
         else:
             st.info("He thong chua co du lieu phat sinh.")
 
-    # --- PHAN HE 2: IN MAU DON DAT HANG PHIÊN BẢN TỰ ĐỘNG CHUYỂN CHỮ ĐẸP ---
+    # --- PHAN HE 2: IN MAU DON DAT HANG ---
     elif menu == "🖨️ In Don dat hang":
         st.title("Mau In Don Dat Hang")
         if os.path.exists(HISTORY_FILE):
@@ -192,24 +192,25 @@ else:
                 df_select = df_filtered[df_filtered["So_chung_tu"] == selected_ct]
                 
                 if not df_select.empty:
+                    # --- ĐÃ VÁ LỖI ILOC[0] TẠI ĐÂY ---
                     m_info = df_select.iloc[0]
                     tong_cong = int(df_select["Thanh_tien"].sum())
                     
-                    # Tu dong dich tong tien hien tai cua hoa don thanh chu tieng Viet
                     chu_so_tien = doc_so_tien_thanh_chu(tong_cong)
                     
                     st.write("---")
                     st.write("CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH")
                     st.write("Lo 04 Khu cong nghiep phu tro, Tinh Ha Tinh, Viet Nam.")
-                    st.write("DON DAT HANG")
+                    st.subheader("DON DAT HANG")
                     
                     col_m1, col_m2 = st.columns(2)
                     with col_m1:
-                        st.write(f"Ten khach hang: {m_info['Khach_hang']}")
-                        st.write(f"Ma khach hang: {m_info['Ma_khach_hang']}")
-                        st.write("Dia chi: Ky Anh - Ha Tinh")
+                        st.write(f"**Ten khach hang:** {m_info['Khach_hang']}")
+                        st.write(f"**Ma khach hang:** {m_info['Ma_khach_hang']}")
+                        st.write("**Dia chi:** Ky Anh - Ha Tinh")
                     with col_m2:
-                        st.write(f"So chung tu: {m_info['So_chung_tu']}")
-                        st.write(f"Ngay hach toan: {m_info['Ngay_hach_toan']}")
-                        st.write("Loai tien: VND")
+                        st.write(f"**So chung tu:** {m_info['So_chung_tu']}")
+                        st.write(f"**Ngay hach toan:** {m_info['Ngay_hach_toan']}")
+                        st.write("**Loai tien:** VND")
                         
+                    st.write("")
