@@ -6,20 +6,6 @@ import time
 
 st.set_page_config(page_title="MISA SME - TOI UU SO CHUNG TU", layout="wide")
 
-# --- ĐOẠN CODE PHONG TOẢ: TỰ ĐỘNG ẨN MENU VÀ NÚT BẤM KHI IN RẤT THÔNG MINH ---
-st.markdown("""
-    <style>
-    @media print {
-        [data-testid="stSidebar"], header, .stButton, [data-testid="stExpander"], div.stSelectbox {
-            display: none !important;
-        }
-        .main .block-container {
-            padding: 0 !important;
-        }
-    }
-    </style>
-""", unsafe-allow_html=True)
-
 PRODUCT_FILE = "kho_hang_lien_co_so.xlsx"
 HISTORY_FILE = "lich_su_lien_co_so.xlsx"
 
@@ -87,7 +73,7 @@ else:
         st.session_state.user_role = None
         st.rerun()
         
-    menu = st.sidebar.radio("PHAN HE CHUC NANG", ["💼 Ban hang (Chung tu)", "🖨️ In Don dat hang"])
+    menu = st.sidebar.radio("PHAN HE CHUC NANG", ["Ban hang (Chung tu)", "In Don dat hang"])
 
     def get_next_so_ct():
         for _ in range(20):
@@ -104,7 +90,7 @@ else:
             except: time.sleep(0.05)
         return f"BH{int(time.time())}"
 
-    if menu == "💼 Ban hang (Chung tu)":
+    if menu == "Ban hang (Chung tu)":
         st.title(f"Ban hang - Danh sach chung tu ({co_so_user})")
         if os.path.exists(HISTORY_FILE): df_hist = pd.read_excel(HISTORY_FILE)
         else: df_hist = pd.DataFrame()
@@ -113,7 +99,7 @@ else:
             df_filtered = df_hist[df_hist["Co_so"] == co_so_user] if not df_hist.empty else pd.DataFrame()
             next_code_preview = get_next_so_ct()
             
-            with st.expander(f"➕ Lap chung tu ban hang moi (Ma goi y tiep theo: {next_code_preview})"):
+            with st.expander(f"Lap chung tu ban hang moi (Ma goi y tiep theo: {next_code_preview})"):
                 with st.form("form_invoice", clear_on_submit=True):
                     c1, c2, c3 = st.columns(3)
                     with c1:
@@ -128,7 +114,7 @@ else:
                         sl = st.number_input("So luong xuat", min_value=0.0, value=100.0, step=0.1)
                         gia = st.number_input("Don gia", min_value=0, value=23500)
                     
-                    if st.form_submit_button("💾 Cat va Ghi so (Luu hoa don)"):
+                    if st.form_submit_button("Cat va Ghi so (Luu hoa don)"):
                         thanh_tien = int(gia * sl)
                         so_ct_final = get_next_so_ct()
                         new_row = {
@@ -163,8 +149,8 @@ else:
             else: st.info("Chua co hoa don nao phat sinh.")
         else: st.info("He thong chua co du lieu phat sinh.")
 
-    elif menu == "🖨️ In Don dat hang":
-        st.markdown("<div class='print-hide'><h3>Mau In Don Dat Hang</h3></div>", unsafe-allow_html=True)
+    elif menu == "In Don dat hang":
+        st.title("Mau In Don Dat Hang")
         if os.path.exists(HISTORY_FILE):
             df_hist = pd.read_excel(HISTORY_FILE)
             df_filtered = df_hist[df_hist["Co_so"] == co_so_user] if co_so_user != "Phong Ke Toan" else df_hist
@@ -180,7 +166,7 @@ else:
                     chu_so_tien = doc_so_tien_thanh_chu(tong_cong)
                     
                     st.write("---")
-                    st.write("**CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH**")
+                    st.write("CONG TY TNHH THUONG MAI VA DICH VU TONG HOP TIEN MINH")
                     st.write("Lo 04 Khu cong nghiep phu tro, Tinh Ha Tinh, Viet Nam.")
                     st.write("### DON DAT HANG")
                     
@@ -199,3 +185,11 @@ else:
                     df_print.columns = ["Ma hang", "Ten hang", "So luong", "Don gia", "Thanh tien"]
                     st.dataframe(df_print, use_container_width=True)
                     
+                    st.write(f"**Tong tien thanh toan:** {tong_cong:,} VND")
+                    st.write(f"**So tien bang chu:** *{chu_so_tien}*")
+                    st.write("---")
+                    st.write("Nguoi mua hang | Ke toan truong | Nguoi lap phieu")
+                    st.write("(Ky, ho ten) | (Ky, ho ten) | (Ky, ho ten)")
+                    st.write("")
+                    
+                    if st.button("🖨️ BAM VAO DAY DE MO HOP THOAI IN"):
