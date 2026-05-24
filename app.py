@@ -192,4 +192,4 @@ else:
                     st.write("(Ky, ho ten) | (Ky, ho ten) | (Ky, ho ten)")
                     st.write("")
                     
-                    if st.button("🖨️ BAM VAO DAY DE MO HOP THOAI IN"):
+                    if st.button("🖨️ Mo cua so huong dan IN"):
